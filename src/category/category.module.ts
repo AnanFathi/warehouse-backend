@@ -14,7 +14,7 @@ import { CategoryController } from './category.controller';
       { name: Item.name, schema: ItemSchema },
     ]),
   ],
-  exports: [MongooseModule],
+  exports: [MongooseModule, CategoryService],
   providers: [CategoryService],
   controllers: [CategoryController],
 })

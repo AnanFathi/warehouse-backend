@@ -16,6 +16,6 @@ import { ItemController } from './item.controller';
   ],
   providers: [ItemService],
   controllers: [ItemController],
-  exports: [MongooseModule],
+  exports: [MongooseModule, ItemService],
 })
 export class ItemModule {}
