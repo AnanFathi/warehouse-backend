@@ -7,11 +7,14 @@ import {
   Body,
   Query,
   Patch,
+  UseGuards,
 } from '@nestjs/common';
 import { ItemService } from './item.service';
 import { Item } from './schemas/item.schema';
 import { IPaginated } from 'src/types/shared.model';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('items')
 export class ItemController {
   constructor(private readonly itemService: ItemService) {}

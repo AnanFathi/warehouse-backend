@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { User } from './schemas/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
+import { IPaginated } from 'src/types/shared.model';
 
 @Injectable()
 export class UserService {
@@ -14,17 +15,24 @@ export class UserService {
     return createdUser.save();
   }
 
-  async findAll(search?: string, role?: string): Promise<User[]> {
+  async findAll(query: {
+    page?: string;
+    itemsPerPage?: string;
+    role?: string;
+    search?: string;
+  }): Promise<IPaginated> {
+    const page = parseInt(query.page || '1', 10);
+    const limit = parseInt(query.itemsPerPage || '10', 10);
     const filters: any = {};
 
     // Add role filter if provided
-    if (role) {
-      filters.role = role;
+    if (query.role) {
+      filters.role = query.role;
     }
 
     // Add search filter if provided
-    if (search) {
-      const regex = new RegExp(search, 'i'); // case-insensitive
+    if (query.search) {
+      const regex = new RegExp(query.search, 'i'); // case-insensitive
       filters.$or = [
         { firstName: regex },
         { lastName: regex },
@@ -32,7 +40,33 @@ export class UserService {
       ];
     }
 
-    return this.userModel.find(filters).select('-password').exec();
+    const [users, totalItems] = await Promise.all([
+      this.userModel
+        .find(filters)
+        .select('-password')
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .exec(),
+      this.userModel.countDocuments(filters),
+    ]);
+
+    if (!users.length) {
+      return {
+        data: [],
+        itemsPerPage: 0,
+        totalItems: 0,
+        currentPage: page,
+        totalPages: 0,
+      };
+    }
+
+    return {
+      data: users,
+      itemsPerPage: users.length,
+      totalItems,
+      currentPage: page,
+      totalPages: Math.ceil(totalItems / limit),
+    };
   }
 
   async findById(id: string): Promise<User> {
