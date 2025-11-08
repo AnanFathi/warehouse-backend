@@ -8,19 +8,22 @@ import {
   Query,
   UseGuards,
   Patch,
+  Request,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './schemas/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { Roles } from 'src/auth/roles.decorator';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/roles.guard';
 
-// @UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  // @Roles('ADMIN')
+  @Roles('ADMIN')
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
@@ -36,11 +39,18 @@ export class UserController {
     return this.userService.findAll({ search, role, page, itemsPerPage });
   }
 
+  @Get('me')
+  async me(@Request() req): Promise<User> {
+    const userId = req.user.userId;
+    return this.userService.getMe(userId);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.userService.findById(id);
   }
 
+  @Roles('ADMIN')
   @Patch(':id')
   update(@Param('id') id: string, @Body() data: Partial<User>) {
     return this.userService.update(id, data);

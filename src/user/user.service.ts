@@ -98,6 +98,15 @@ export class UserService {
     return user;
   }
 
+  async getMe(userId: string): Promise<User> {
+    const user = await this.userModel
+      .findById(userId)
+      .select('-password')
+      .exec();
+    if (!user) throw new NotFoundException('User not found');
+    return user;
+  }
+
   async update(id: string, data: Partial<User>): Promise<User> {
     // 🚫 Prevent updating password through this endpoint
     if ('password' in data) {
