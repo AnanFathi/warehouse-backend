@@ -45,6 +45,18 @@ export class UserController {
     return this.userService.getMe(userId);
   }
 
+  @Patch('me')
+  updateMe(@Request() req, @Body() data: Partial<User>) {
+    const userId = req.user.userId;
+    return this.userService.update(userId, data);
+  }
+
+  @Post('me/change-password')
+  async changePasswordMe(@Request() req, @Body() body: ChangePasswordDto) {
+    const userId = req.user.userId;
+    return this.userService.changePassword(userId, body.password);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.userService.findById(id);

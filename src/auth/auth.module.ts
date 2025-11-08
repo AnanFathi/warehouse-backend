@@ -16,7 +16,6 @@ import { UserModule } from '../user/user.module';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
         const secret = configService.get<string>('JWT_SECRET');
-        console.log('🔐 JWT secret (AuthModule):', secret);
         return {
           secret: secret || 'default_secret',
           signOptions: { expiresIn: '7d' },
