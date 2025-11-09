@@ -100,12 +100,11 @@ export class CategoryService {
     return this.getCounts(updated);
   }
 
-  async remove(id: string): Promise<void> {
-    const deleted = await this.categoryModel.findByIdAndDelete(id);
-    if (!deleted) throw new NotFoundException('Category not found');
-    await this.itemModel.updateMany(
-      { category: id },
-      { $set: { category: null } },
-    );
+  async remove(id: string): Promise<{}> {
+    await this.categoryModel.findByIdAndDelete(id).exec();
+    await this.itemModel
+      .updateMany({ category: id }, { $set: { category: null } })
+      .exec();
+    return {};
   }
 }
