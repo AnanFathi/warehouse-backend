@@ -14,8 +14,28 @@ export class ItemService {
     @InjectModel(Attribute.name) private attributeModel: Model<Attribute>,
   ) {}
 
-  async create(data: any): Promise<Item> {
-    const created = new this.itemModel(data);
+  async create(data: {
+    category?: string;
+    name: string;
+    comment?: string;
+    status: string;
+  }): Promise<Item> {
+    let categoryId: Types.ObjectId | null = null;
+
+    // Only try to resolve the category if a string was provided
+    if (data.category) {
+      const category = await this.categoryModel.findById(data.category).exec();
+      if (!category) {
+        throw new Error('Category not found'); // optional: or just leave null
+      }
+      categoryId = category._id as any;
+    }
+
+    const created = new this.itemModel({
+      ...data,
+      category: categoryId, // will be null if no category
+    });
+
     return created.save();
   }
 
