@@ -15,25 +15,25 @@ export class ItemService {
   ) {}
 
   async create(data: {
-    category?: string;
+    category: string; // required
     name: string;
     comment?: string;
     status: string;
   }): Promise<Item> {
-    let categoryId: Types.ObjectId | null = null;
-
-    // Only try to resolve the category if a string was provided
-    if (data.category) {
-      const category = await this.categoryModel.findById(data.category).exec();
-      if (!category) {
-        throw new Error('Category not found'); // optional: or just leave null
-      }
-      categoryId = category._id as any;
+    if (!data.category) {
+      throw new Error('Category is required');
     }
 
+    // Check that the category exists
+    const category = await this.categoryModel.findById(data.category).exec();
+    if (!category) {
+      throw new Error('Category not found');
+    }
+
+    // Create the item with the valid ObjectId
     const created = new this.itemModel({
       ...data,
-      category: categoryId, // will be null if no category
+      category: category._id, // this is now guaranteed to be a valid ObjectId
     });
 
     return created.save();
@@ -83,9 +83,9 @@ export class ItemService {
     return updatedItem;
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: string): Promise<{}> {
     const deleted = await this.itemModel.findByIdAndDelete(id);
-    if (!deleted) throw new NotFoundException('Item not found');
+    return {};
   }
 
   // 🧩 Fetch items with optional filters + pagination

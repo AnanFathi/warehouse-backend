@@ -73,7 +73,7 @@ export class ItemController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string): Promise<void> {
+  remove(@Param('id') id: string): Promise<{}> {
     return this.itemService.remove(id);
   }
 }
