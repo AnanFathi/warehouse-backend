@@ -184,6 +184,7 @@ export class ItemService {
       this.itemModel
         .find(filter)
         .populate('category')
+        .sort({ updatedAt: -1 })
         .skip((page - 1) * limit)
         .limit(limit)
         .exec(),
