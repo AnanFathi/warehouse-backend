@@ -70,6 +70,7 @@ export class ItemService {
 
   // 🧩 Fetch items with optional filters + pagination
   async findWithFilters(query: {
+    id?: string;
     category?: string;
     status?: string;
     page?: string;
@@ -80,6 +81,16 @@ export class ItemService {
     const page = parseInt(query.page || '1', 10);
     const limit = parseInt(query.itemsPerPage || '10', 10);
     const filter: Record<string, any> = {};
+
+    // -------- Id ----------
+    if (query.id) {
+      filter.$expr = {
+        $regexMatch: {
+          input: { $toString: '$_id' },
+          regex: new RegExp(`^${query.id}`),
+        },
+      };
+    }
 
     // -------- Status ----------
     if (query.status) {

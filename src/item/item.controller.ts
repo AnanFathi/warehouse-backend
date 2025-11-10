@@ -26,6 +26,7 @@ export class ItemController {
 
   @Get()
   findAll(
+    @Query('id') id?: string,
     @Query('category') category?: string,
     @Query('status') status?: string,
     @Query('page') page?: string,
@@ -43,6 +44,7 @@ export class ItemController {
     }
 
     return this.itemService.findWithFilters({
+      id,
       category,
       status,
       page,
