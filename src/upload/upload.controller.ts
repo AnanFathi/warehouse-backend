@@ -16,7 +16,7 @@ export class UploadController {
   @Post(':type/:id')
   @UseInterceptors(FileInterceptor('file'))
   async uploadImage(
-    @Param('type') type: 'item' | 'category',
+    @Param('type') type: 'user' | 'category' | 'item',
     @Param('id') id: string,
     @UploadedFile() file: Express.Multer.File,
   ) {

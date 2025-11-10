@@ -7,12 +7,14 @@ import { CategoryService } from '../category/category.service';
 import { ItemService } from '../item/item.service';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { ConfigService } from '@nestjs/config';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class UploadService {
   private supabase: SupabaseClient;
 
   constructor(
+    private readonly userService: UserService,
     private readonly categoryService: CategoryService,
     private readonly itemService: ItemService,
     private readonly configService: ConfigService,
@@ -28,7 +30,7 @@ export class UploadService {
   }
 
   async uploadEntityImage(
-    type: 'category' | 'item',
+    type: 'user' | 'category' | 'item',
     id: string,
     file: Express.Multer.File,
   ) {
@@ -37,6 +39,10 @@ export class UploadService {
     // Step 0: Ensure entity exists
     let entity: any;
     switch (type) {
+      case 'user':
+        entity = await this.userService.findById(id);
+        if (!entity) throw new NotFoundException('User not found');
+        break;
       case 'category':
         entity = await this.categoryService.findOne(id);
         if (!entity) throw new NotFoundException('Category not found');
@@ -82,6 +88,8 @@ export class UploadService {
 
     // Step 5: Update entity in database
     switch (type) {
+      case 'user':
+        return this.userService.update(id, { imageURL: publicUrl });
       case 'category':
         return this.categoryService.update(id, { imageURL: publicUrl });
       case 'item':
