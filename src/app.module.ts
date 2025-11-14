@@ -9,6 +9,7 @@ import { ItemModule } from './item/item.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { UploadModule } from './upload/upload.module';
+import { ColorModule } from './color/color.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { UploadModule } from './upload/upload.module';
     UserModule,
     AuthModule,
     UploadModule,
+    ColorModule,
   ],
   controllers: [AppController],
   providers: [AppService],
