@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { Category } from 'src/category/schemas/category.schema';
 import { Attribute } from 'src/attribute/schemas/attribute.schema';
+import { Color } from 'src/color/schemas/color.schema';
 
 @Schema({ timestamps: true })
 export class Item extends Document {
@@ -36,6 +37,18 @@ export class Item extends Document {
 
   @Prop({ type: String, required: false })
   imageURL?: string;
+
+  @Prop({ type: Types.ObjectId, ref: 'Color', required: false })
+  color?: Color;
+
+  @Prop({ type: Number, required: false })
+  width?: number;
+
+  @Prop({ type: Number, required: false })
+  length?: number;
+
+  @Prop({ type: Number, required: false })
+  height?: number;
 }
 
 export const ItemSchema = SchemaFactory.createForClass(Item);

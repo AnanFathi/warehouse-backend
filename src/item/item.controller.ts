@@ -28,6 +28,7 @@ export class ItemController {
   findAll(
     @Query('id') id?: string,
     @Query('category') category?: string,
+    @Query('color') color?: string,
     @Query('status') status?: string,
     @Query('page') page?: string,
     @Query('itemsPerPage') itemsPerPage?: string,
@@ -46,6 +47,7 @@ export class ItemController {
     return this.itemService.findWithFilters({
       id,
       category,
+      color,
       status,
       page,
       itemsPerPage,

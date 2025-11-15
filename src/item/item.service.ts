@@ -4,6 +4,7 @@ import { Model, Types } from 'mongoose';
 import { Item } from './schemas/item.schema';
 import { Category } from 'src/category/schemas/category.schema';
 import { Attribute } from 'src/attribute/schemas/attribute.schema';
+import { Color } from 'src/color/schemas/color.schema';
 import { IPaginated } from 'src/types/shared.model';
 
 @Injectable()
@@ -12,35 +13,49 @@ export class ItemService {
     @InjectModel(Item.name) private itemModel: Model<Item>,
     @InjectModel(Category.name) private categoryModel: Model<Category>,
     @InjectModel(Attribute.name) private attributeModel: Model<Attribute>,
+    @InjectModel(Color.name) private colorModel: Model<Color>,
   ) {}
 
   async create(data: {
-    category: string; // required
+    category: string;
     name: string;
     comment?: string;
     status: string;
+
+    color?: string;
+    width?: number;
+    length?: number;
+    height?: number;
   }): Promise<Item> {
     if (!data.category) {
       throw new Error('Category is required');
     }
 
-    // Check that the category exists
-    const category = await this.categoryModel.findById(data.category).exec();
-    if (!category) {
-      throw new Error('Category not found');
+    const category = await this.categoryModel.findById(data.category);
+    if (!category) throw new Error('Category not found');
+
+    // Validate color if provided
+    if (data.color) {
+      const color = await this.colorModel.findById(data.color).exec();
+      if (!color) throw new Error('Color not found');
     }
 
-    // Create the item with the valid ObjectId
     const created = new this.itemModel({
       ...data,
-      category: category._id, // this is now guaranteed to be a valid ObjectId
+      category: category._id,
+      color: data.color || null,
     });
 
     return created.save();
   }
 
   async findOne(id: string): Promise<Item> {
-    const item = await this.itemModel.findById(id).populate('category').exec();
+    const item = await this.itemModel
+      .findById(id)
+      .populate('category')
+      .populate('color')
+      .exec();
+
     if (!item) throw new NotFoundException('Item not found');
     return item;
   }
@@ -51,9 +66,16 @@ export class ItemService {
       if (!category) throw new NotFoundException('Category not found');
     }
 
+    if (data.color) {
+      const color = await this.colorModel.findById(data.color);
+      if (!color) throw new NotFoundException('Color not found');
+    }
+
     const updated = await this.itemModel
       .findByIdAndUpdate(id, data, { new: true })
-      .populate('category');
+      .populate('category')
+      .populate('color');
+
     if (!updated) throw new NotFoundException('Item not found');
     return updated;
   }
@@ -77,6 +99,7 @@ export class ItemService {
     const updatedItem = await this.itemModel
       .findById(itemId)
       .populate('category')
+      .populate('color')
       .exec();
 
     if (!updatedItem) throw new NotFoundException('Updated item not found');
@@ -92,6 +115,7 @@ export class ItemService {
   async findWithFilters(query: {
     id?: string;
     category?: string;
+    color?: string;
     status?: string;
     page?: string;
     itemsPerPage?: string;
@@ -134,7 +158,7 @@ export class ItemService {
           .lean()
           .exec();
         if (categoryDoc)
-          categoryId = new Types.ObjectId((categoryDoc as any)._id);
+          categoryId = new Types.ObjectId(categoryDoc._id.toString());
       }
 
       if (!categoryId) {
@@ -148,6 +172,22 @@ export class ItemService {
       }
 
       filter.category = categoryId;
+    }
+
+    // -------- Color (accept ID) ----------
+    if (query.color) {
+      // Only assign if it's a valid ObjectId
+      if (!Types.ObjectId.isValid(query.color)) {
+        return {
+          data: [],
+          itemsPerPage: 0,
+          totalItems: 0,
+          currentPage: page,
+          totalPages: 0,
+        };
+      }
+
+      filter.color = query.color; // assign string directly
     }
 
     // -------- Attributes (keys can be attribute name OR attribute id) ----------
@@ -204,6 +244,7 @@ export class ItemService {
       this.itemModel
         .find(filter)
         .populate('category')
+        .populate('color')
         .sort({ updatedAt: -1 })
         .skip((page - 1) * limit)
         .limit(limit)
