@@ -2,11 +2,13 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Color } from './schemas/color.schema';
+import { Item } from 'src/item/schemas/item.schema';
 
 @Injectable()
 export class ColorsService {
   constructor(
     @InjectModel(Color.name) private readonly colorModel: Model<Color>,
+    @InjectModel(Item.name) private readonly itemModel: Model<Item>,
   ) {}
 
   async findAll(search?: string): Promise<Color[]> {
@@ -38,6 +40,9 @@ export class ColorsService {
 
   async remove(id: string): Promise<{}> {
     await this.colorModel.findByIdAndDelete(id).exec();
+    await this.itemModel
+      .updateMany({ color: id }, { $unset: { color: '' } })
+      .exec();
     return {};
   }
 }
