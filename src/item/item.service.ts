@@ -28,16 +28,16 @@ export class ItemService {
     height?: number;
   }): Promise<Item> {
     if (!data.category) {
-      throw new Error('Category is required');
+      throw new NotFoundException('Category is required');
     }
 
     const category = await this.categoryModel.findById(data.category);
-    if (!category) throw new Error('Category not found');
+    if (!category) throw new NotFoundException('Category not found');
 
     // Validate color if provided
     if (data.color) {
       const color = await this.colorModel.findById(data.color).exec();
-      if (!color) throw new Error('Color not found');
+      if (!color) throw new NotFoundException('Color not found');
     }
 
     const created = new this.itemModel({
