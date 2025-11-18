@@ -20,7 +20,7 @@ export class UploadController {
     @Param('id') id: string,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    if (!file) throw new BadRequestException('No file uploaded');
+    if (!file) throw new BadRequestException('NO_FILE_UPLOADED');
 
     return this.uploadService.uploadEntityImage(type, id, file);
   }

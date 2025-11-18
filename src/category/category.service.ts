@@ -86,7 +86,7 @@ export class CategoryService {
       .populate('attributes')
       .exec();
 
-    if (!category) throw new NotFoundException('Category not found');
+    if (!category) throw new NotFoundException('CATEGORY_NOT_FOUND');
     return this.getCounts(category);
   }
 
@@ -95,7 +95,7 @@ export class CategoryService {
       .findByIdAndUpdate(id, data, { new: true })
       .populate('attributes');
 
-    if (!updated) throw new NotFoundException('Category not found');
+    if (!updated) throw new NotFoundException('CATEGORY_NOT_FOUND');
 
     return this.getCounts(updated);
   }

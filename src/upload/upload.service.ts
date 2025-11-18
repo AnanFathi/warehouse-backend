@@ -34,22 +34,22 @@ export class UploadService {
     id: string,
     file: Express.Multer.File,
   ) {
-    if (!file) throw new BadRequestException('No file provided');
+    if (!file) throw new BadRequestException('NO_FILE_PROVIDED');
 
     // Step 0: Ensure entity exists
     let entity: any;
     switch (type) {
       case 'user':
         entity = await this.userService.findById(id);
-        if (!entity) throw new NotFoundException('User not found');
+        if (!entity) throw new NotFoundException('USER_NOT_FOUND');
         break;
       case 'category':
         entity = await this.categoryService.findOne(id);
-        if (!entity) throw new NotFoundException('Category not found');
+        if (!entity) throw new NotFoundException('CATEGORY_NOT_FOUND');
         break;
       case 'item':
         entity = await this.itemService.findOne(id);
-        if (!entity) throw new NotFoundException('Item not found');
+        if (!entity) throw new NotFoundException('ITEM_NOT_FOUND');
         break;
       default:
         throw new BadRequestException(`Invalid type: ${type}`);

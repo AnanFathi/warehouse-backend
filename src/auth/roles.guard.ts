@@ -24,12 +24,12 @@ export class RolesGuard implements CanActivate {
     const user = request.user;
 
     if (!user) {
-      throw new ForbiddenException('User not found in request');
+      throw new ForbiddenException('USER_NOT_FOUND');
     }
 
     if (!requiredRoles.includes(user.role)) {
       throw new ForbiddenException(
-        'You do not have permission to access this resource',
+        'YOU_DO_NOT_HAVE_PERMISSION',
       );
     }
 

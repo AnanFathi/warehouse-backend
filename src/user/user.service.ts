@@ -20,7 +20,7 @@ export class UserService {
       email: createUserDto.email,
     });
     if (existingUser) {
-      throw new ConflictException('A user with this email already exists');
+      throw new ConflictException('EMAIL_ALREADY_EXISTS');
     }
 
     // 2️⃣ Hash password if provided
@@ -94,7 +94,7 @@ export class UserService {
 
   async findById(id: string): Promise<User> {
     const user = await this.userModel.findById(id).select('-password').exec();
-    if (!user) throw new NotFoundException('User not found');
+    if (!user) throw new NotFoundException('USER_NOT_FOUND');
     return user;
   }
 
@@ -103,7 +103,7 @@ export class UserService {
       .findById(userId)
       .select('-password')
       .exec();
-    if (!user) throw new NotFoundException('User not found');
+    if (!user) throw new NotFoundException('USER_NOT_FOUND');
     return user;
   }
 
@@ -119,7 +119,7 @@ export class UserService {
       .exec();
 
     if (!updatedUser) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('USER_NOT_FOUND');
     }
 
     return updatedUser;
@@ -136,7 +136,7 @@ export class UserService {
 
   async changePassword(id: string, newPassword: string): Promise<User> {
     const user = await this.userModel.findById(id).exec();
-    if (!user) throw new NotFoundException('User not found');
+    if (!user) throw new NotFoundException('USER_NOT_FOUND');
 
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();

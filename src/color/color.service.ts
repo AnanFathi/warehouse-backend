@@ -18,7 +18,7 @@ export class ColorsService {
 
   async findOne(id: string): Promise<Color> {
     const color = await this.colorModel.findById(id).exec();
-    if (!color) throw new NotFoundException('Color not found');
+    if (!color) throw new NotFoundException('COLOR_NOT_FOUND');
     return color;
   }
 
@@ -34,7 +34,7 @@ export class ColorsService {
     const updated = await this.colorModel
       .findByIdAndUpdate(id, data, { new: true })
       .exec();
-    if (!updated) throw new NotFoundException('Color not found');
+    if (!updated) throw new NotFoundException('COLOR_NOT_FOUND');
     return updated;
   }
 

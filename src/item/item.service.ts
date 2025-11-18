@@ -28,16 +28,16 @@ export class ItemService {
     height?: number;
   }): Promise<Item> {
     if (!data.category) {
-      throw new NotFoundException('Category is required');
+      throw new NotFoundException('CATEGORY_IS_REQUIRED');
     }
 
     const category = await this.categoryModel.findById(data.category);
-    if (!category) throw new NotFoundException('Category not found');
+    if (!category) throw new NotFoundException('CATEGORY_NOT_FOUND');
 
     // Validate color if provided
     if (data.color) {
       const color = await this.colorModel.findById(data.color).exec();
-      if (!color) throw new NotFoundException('Color not found');
+      if (!color) throw new NotFoundException('COLOR_NOT_FOUND');
     }
 
     const created = new this.itemModel({
@@ -56,19 +56,19 @@ export class ItemService {
       .populate('color')
       .exec();
 
-    if (!item) throw new NotFoundException('Item not found');
+    if (!item) throw new NotFoundException('ITEM_NOT_FOUND');
     return item;
   }
 
   async update(id: string, data: any): Promise<Item> {
     if (data.category) {
       const category = await this.categoryModel.findById(data.category);
-      if (!category) throw new NotFoundException('Category not found');
+      if (!category) throw new NotFoundException('CATEGORY_NOT_FOUND');
     }
 
     if (data.color) {
       const color = await this.colorModel.findById(data.color);
-      if (!color) throw new NotFoundException('Color not found');
+      if (!color) throw new NotFoundException('COLOR_NOT_FOUND');
     }
 
     const updated = await this.itemModel
@@ -76,7 +76,7 @@ export class ItemService {
       .populate('category')
       .populate('color');
 
-    if (!updated) throw new NotFoundException('Item not found');
+    if (!updated) throw new NotFoundException('ITEM_NOT_FOUND');
     return updated;
   }
 
@@ -86,12 +86,12 @@ export class ItemService {
     newValue: string,
   ): Promise<Item> {
     const item = await this.itemModel.findById(itemId);
-    if (!item) throw new NotFoundException('Item not found');
+    if (!item) throw new NotFoundException('ITEM_NOT_FOUND');
 
     const attr = item.attributes.find(
       (a) => a.attribute.toString() === attributeId,
     );
-    if (!attr) throw new NotFoundException('Attribute not found in this item');
+    if (!attr) throw new NotFoundException('ATTRIBUTE_NOT_FOUND');
 
     attr.value = newValue;
     await item.save();
@@ -102,7 +102,7 @@ export class ItemService {
       .populate('color')
       .exec();
 
-    if (!updatedItem) throw new NotFoundException('Updated item not found');
+    if (!updatedItem) throw new NotFoundException('ITEM_NOT_FOUND');
     return updatedItem;
   }
 

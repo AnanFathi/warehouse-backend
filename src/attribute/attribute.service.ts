@@ -76,7 +76,7 @@ export class AttributeService {
 
   async findOne(id: string): Promise<Attribute> {
     const attribute = await this.attributeModel.findById(id).exec();
-    if (!attribute) throw new NotFoundException('Attribute not found');
+    if (!attribute) throw new NotFoundException('ATTRIBUTE_NOT_FOUND');
     return attribute;
   }
 
@@ -84,13 +84,13 @@ export class AttributeService {
     const updated = await this.attributeModel.findByIdAndUpdate(id, data, {
       new: true,
     });
-    if (!updated) throw new NotFoundException('Attribute not found');
+    if (!updated) throw new NotFoundException('ATTRIBUTE_NOT_FOUND');
     return updated;
   }
 
   async remove(id: string): Promise<void> {
     const deleted = await this.attributeModel.findByIdAndDelete(id);
-    if (!deleted) throw new NotFoundException('Attribute not found');
+    if (!deleted) throw new NotFoundException('ATTRIBUTE_NOT_FOUND');
 
     // Remove this attribute ID from all categories
     await this.categoryModel.updateMany(
