@@ -12,6 +12,7 @@ import { UserService } from 'src/user/user.service';
 @Injectable()
 export class UploadService {
   private supabase: SupabaseClient;
+  private bucketName: string;
 
   constructor(
     private readonly userService: UserService,
@@ -21,11 +22,13 @@ export class UploadService {
   ) {
     const supabaseUrl = this.configService.get<string>('SUPABASE_URL');
     const supabaseKey = this.configService.get<string>('SUPABASE_KEY');
+    const bucket = this.configService.get<string>('BUCKET_NAME');
 
     if (!supabaseUrl || !supabaseKey) {
       throw new Error('Supabase URL or KEY is not set in env');
     }
 
+    this.bucketName = bucket || 'app-images';
     this.supabase = createClient(supabaseUrl, supabaseKey);
   }
 
@@ -60,7 +63,7 @@ export class UploadService {
       const oldPath = this.extractFilePathFromUrl(entity.imageURL);
       if (oldPath) {
         this.supabase.storage
-          .from('app-images')
+          .from(this.bucketName)
           .remove([oldPath])
           .catch(() => {});
       }
@@ -71,7 +74,7 @@ export class UploadService {
 
     // Step 3: Upload to Supabase
     const { data: uploadData, error } = await this.supabase.storage
-      .from('app-images')
+      .from(this.bucketName)
       .upload(filePath, file.buffer, {
         cacheControl: '3600',
         upsert: true,
@@ -82,7 +85,7 @@ export class UploadService {
 
     // Step 4: Get public URL
     const { data } = this.supabase.storage
-      .from('app-images')
+      .from(this.bucketName)
       .getPublicUrl(filePath);
     const publicUrl = data.publicUrl;
 
@@ -100,5 +103,25 @@ export class UploadService {
   private extractFilePathFromUrl(url: string): string | null {
     const match = url.match(/\/object\/public\/app-images\/(.+)$/);
     return match ? match[1] : null;
+  }
+
+  async ensureSupabaseActive(): Promise<void> {
+    const { data, error } = await this.supabase.storage
+      .from(this.bucketName)
+      .list('', {
+        limit: 1,
+        offset: 0,
+      });
+
+    if (error) {
+      console.error(
+        `[Supabase Cron] Failed to list bucket: ${this.bucketName}`,
+        error.message,
+      );
+    } else {
+      console.log(
+        `[Supabase Cron] Successfully listed ${data?.length} item(s) in '${this.bucketName}'. Supabase is active.`,
+      );
+    }
   }
 }
