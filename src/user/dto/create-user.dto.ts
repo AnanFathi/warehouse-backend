@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 
 export class CreateUserDto {
-  @IsEmail()
+  @IsEmail({}, { message: 'INVALID_EMAIL_FORMAT' })
   email: string;
 
   @IsString()
