@@ -32,6 +32,11 @@ export class CategoryService {
     return created.save();
   }
 
+  async findAllSimpleList(search?: string): Promise<Category[]> {
+    const filter = search ? { name: { $regex: search, $options: 'i' } } : {};
+    return this.categoryModel.find(filter).sort({ name: 1 }).exec();
+  }
+
   // 🧩 Unified find
   async findCategories(query: {
     page?: string;

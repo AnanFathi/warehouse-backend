@@ -25,13 +25,19 @@ export class CategoryController {
   }
 
   // 📋 Unified GET for all categories
+  @Get('/simple-list')
+  async findAllSimpleList(): Promise<Category[]> {
+    return this.categoryService.findAllSimpleList();
+  }
+
+  // 📋 Unified GET for all categories
   @Get()
   async findAll(
     @Query('page') page?: string,
     @Query('itemsPerPage') itemsPerPage?: string,
     @Query('name') name?: string,
   ): Promise<IPaginated> {
-    return this.categoryService.findCategories({page, itemsPerPage, name});
+    return this.categoryService.findCategories({ page, itemsPerPage, name });
   }
 
   // 🔍 Get one
