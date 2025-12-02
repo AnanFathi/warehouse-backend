@@ -18,8 +18,9 @@ export class CategoryService {
   ) {}
 
   private async getCounts(category: Category): Promise<any> {
-    const id = (category._id as Types.ObjectId).toString();
-    const itemCount = await this.itemModel.countDocuments({ category: id });
+    const itemCount = await this.itemModel.countDocuments({
+      category: category._id as any,
+    });
 
     return {
       ...category.toObject(),
