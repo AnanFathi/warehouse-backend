@@ -41,7 +41,7 @@ export class ColorsService {
   async remove(id: string): Promise<{}> {
     await this.colorModel.findByIdAndDelete(id).exec();
     await this.itemModel
-      .updateMany({ color: id }, { $unset: { color: '' } })
+      .updateMany({ color: id }, { $unset: { color: true } })
       .exec();
     return {};
   }
