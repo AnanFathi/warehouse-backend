@@ -19,7 +19,7 @@ export class CategoryService {
 
   private async getCounts(category: Category): Promise<any> {
     const itemCount = await this.itemModel.countDocuments({
-      category: category._id as any,
+      category: category._id,
     });
 
     return {

@@ -64,11 +64,17 @@ export class ItemService {
     if (data.category) {
       const category = await this.categoryModel.findById(data.category);
       if (!category) throw new NotFoundException('CATEGORY_NOT_FOUND');
+      data.category = category._id;
     }
 
     if (data.color) {
       const color = await this.colorModel.findById(data.color);
       if (!color) throw new NotFoundException('COLOR_NOT_FOUND');
+    }
+
+    // Normalize color: "" or undefined -> null (clears it)
+    if ('color' in data) {
+      data.color = data.color || null;
     }
 
     const updated = await this.itemModel

@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { Category } from 'src/category/schemas/category.schema';
 import { Attribute } from 'src/attribute/schemas/attribute.schema';
 import { Color } from 'src/color/schemas/color.schema';
 
@@ -8,7 +7,7 @@ import { Color } from 'src/color/schemas/color.schema';
 export class Item extends Document {
   // ✅ Reference to the category
   @Prop({ type: Types.ObjectId, ref: 'Category', required: true })
-  category: Category;
+  category: Types.ObjectId;
 
   // ✅ Attributes (reference + optional value)
   @Prop({
